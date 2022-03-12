@@ -37,5 +37,6 @@ conn devgateway-to-prodgateway
 
 ###  PSK  ###
 echo $IP_Pub $Remote_IP_Pub : PSK "'$PSK'" >> /etc/ipsec.secrets
+ip route add $Remote_Network via $Remote_IP_Pub
 
 systemctl restart ipsec
