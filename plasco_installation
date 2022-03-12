@@ -1,0 +1,24 @@
+#!/bin/bash
+
+###  Sysctl Configurations  ###
+echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
+echo net.ipv6.conf.all.forwarding = 1 >> /etc/sysctl.conf
+echo net.ipv4.conf.all.accept_redirects = 0 >> /etc/sysctl.conf
+echo net.ipv4.conf.all.send_redirects = 0 >> /etc/sysctl.conf
+sysctl -p
+
+
+###  Install Strongswan  ###
+apt update
+apt install strongswan
+apt install dialog
+
+systemctl start ipsec
+systemctl enabled ipsec
+
+###  Change File permissions  ###
+chmod 755 ./plasco_conf
+chmod 755 ./plasco
+
+cp plasco_conf /usr/bin
+cp plasco /usr/bin

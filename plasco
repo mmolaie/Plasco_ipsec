@@ -1,0 +1,37 @@
+#!/bin/bash
+
+HEIGHT=15
+WIDTH=40
+CHOICE_HEIGHT=4
+BACKTITLE="Plasco VPN Configuration"
+TITLE="IPSec Configure Toturial"
+MENU="Choose options:"
+
+OPTIONS=(1 "IPSec start"
+         2 "IPSec restart"
+         3 "IPSec stop"
+	     4 "IPSec config"	)
+
+CHOICE=$(dialog --clear \
+                --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
+                --menu "$MENU" \
+                $HEIGHT $WIDTH $CHOICE_HEIGHT \
+                "${OPTIONS[@]}" \
+                2>&1 >/dev/tty)
+
+clear
+case $CHOICE in
+        1)
+            echo "systemctl start ipsec"
+            ;;
+        2)
+            echo "systemctl restart ipsec"
+            ;;
+        3)
+            echo "systemctl stop ipsec"
+            ;;
+	    4)
+            ./plasco_conf
+            ;;
+esac

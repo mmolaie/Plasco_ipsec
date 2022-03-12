@@ -1,0 +1,41 @@
+#!/bin/bash
+
+###  Configure IPSec.conf  ###
+
+IP_Pub=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter Your PUB IP:" 10 60 1.1.1.1 3>&1 1>&2 2>&3)
+Remote_IP_Pub=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter Remote PUB IP:" 10 60 2.2.2.2 3>&1 1>&2 2>&3)
+Priv_Range=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter Your Private IP:" 10 60 172.0.0.0/16 3>&1 1>&2 2>&3)
+Remote_Network=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter Remote Private IP:" 10 60 10.0.0.0/24 3>&1 1>&2 2>&3)
+PSK=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter PSK[pre-share key]:" 10 60 secret 3>&1 1>&2 2>&3)
+P1=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter ike:" 10 60 aes256-sha1-modp1024 3>&1 1>&2 2>&3)
+P2=$(whiptail --title "Plasco: IPSec VPN Configuration" --inputbox "Enter esp:" 10 60 aes256-sha1 3>&1 1>&2 2>&3)
+
+cp /etc/ipsec.conf /etc/ipsec.conf.backup
+touch /etc/ipsec.conf
+
+echo 'config setup 
+        charondebug="all" 
+        uniqueids=yes 
+conn devgateway-to-prodgateway 
+        type=tunnel 
+        auto=start 
+        keyexchange=ikev2 
+        authby=secret 
+        left='$IP_Pub'
+        leftsubnet='$Priv_Range'
+        right='$Remote_IP_Pub'
+        rightsubnet='$Remote_Network'
+        ike='$P1'! 
+        esp='$P2'! 
+        aggressive=no 
+        keyingtries=%forever 
+        ikelifetime=28800s 
+        lifetime=3600s 
+        dpddelay=30s 
+        dpdtimeout=120s 
+        dpdaction=restart' > /etc/ipsec.conf
+
+###  PSK  ###
+echo $IP_Pub $Remote_IP_Pub : PSK "'$PSK'" >> /etc/ipsec.secrets
+
+systemctl restart ipsec
